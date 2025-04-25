@@ -1,0 +1,44 @@
+
+    body {
+        background-color: white;
+        position: static;
+        align-items: center;
+    }
+    .landing-container {
+        display: flex;
+        flex: 2;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px;
+        border-radius: 20px;
+    }
+    .card{
+        width: 100%;
+        height: auto;
+        margin-top: 80px;
+        margin-bottom: 80px;
+        padding: 20px;
+
+    }
+    .landing-text {
+        max-width: 45%;
+        text-align: center;
+        padding: 50px;
+    }
+    .landing-image img {
+        max-width: 500px;
+        max-height: 500px;
+    }
+    .btn-start {
+        background-color: #00aaff;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .btn-start:hover {
+        background-color: #008ecc;
+    }
