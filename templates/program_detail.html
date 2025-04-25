@@ -216,6 +216,10 @@
 
     <!-- Close Button -->
     <form action="{{ url_for('close_program', program_id=program.id) }}" method="POST" onsubmit="return confirm('Update the Program Status?')">
+        <button type="submit" class="btn btn-danger">Update Status</button>
+    </form>
+    <!-- Delete Button -->
+    <form action="{{ url_for('delete_program', program_id=program.id) }}" method="POST" onsubmit="return confirm('Confirm Delete?')">
         <button type="submit" class="btn btn-danger">Close Program</button>
     </form>
 </div>

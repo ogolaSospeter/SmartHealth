@@ -550,6 +550,32 @@ def close_program(program_id):
         flash(f"Error in updating the program status: {e}", "danger")
         return redirect(url_for('edit_program', program_id=program_id))
 
+"""
+Function to delete a program
+"""
+@app.route('/program/<int:program_id>/delete', methods=['POST'])
+@token_required
+def delete_program(program_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Delete all milestones and resources associated with the program
+        cursor.execute("DELETE FROM program_milestones WHERE program_id = ?", (program_id,))
+        cursor.execute("DELETE FROM program_resources WHERE program_id = ?", (program_id,))
+
+        # Delete the program itself
+        cursor.execute("DELETE FROM health_programs WHERE id = ?", (program_id,))
+
+        conn.commit()
+        conn.close()
+        flash("Program Deleted Successfully!", "success")
+        return redirect(url_for('dashboard'))
+    
+    except Exception as e:
+        flash(f"Error in deleting the program: {e}", "danger")
+        return redirect(url_for('view_program', program_id=program_id))
+
 @app.route('/program/<int:program_id>/update', methods=['POST'])
 @token_required
 def update_program(program_id):
