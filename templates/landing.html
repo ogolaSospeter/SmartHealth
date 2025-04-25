@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<link rel="stylesheet" href="/static/styles/landing.css">
+{% endblock %}
+
+{% block content %}
+
+
+<div class="container landing-container card">
+    <div class="landing-text">
+        <h2 style="color: chocolate;"><strong>Smart Health<br>System</strong></h2><br><br>
+        <p>Smarter care starts here — manage clients, track programs, and make every visit count.</p>
+        <br><br>
+        <a href="{{ url_for('signIn') }}" class="btn-start">Get Started</a>
+    </div>
+    <div class="landing-image">
+        <img src="/static/images/landing.jpg" alt="Landing illustration">
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+{% include 'headfoot/footer.html' %}
+{% endblock %}

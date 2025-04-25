@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard</title>
+    <link rel="stylesheet" href="/static/styles/dashboard.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEJt3WvL7aA4n5M1Ke8anD3i0Hz6Hg0F3AzZsjzUGnV0x6C3ZmP5nKtbOljw6" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="/static/images/landing.jpg" alt="Health System Logo" class="logo">
+                <h3>SmartHealth System</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active">
+                        <a href="#dashboard-overview">
+                            <span class="material-icons">dashboard</span>
+                            Overview
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#clients">
+                            <span class="material-icons">people</span>
+                            View Clients
+                        </a>
+                    </li>
+                    <li>
+                        
+                            <a href="#enrollclients">
+                                <span class="material-icons">assignment</span>
+                                Enroll Client
+                            </a>
+                            </li>
+                        
+                    <li>
+                        <a href="#programs">
+                            <span class="material-icons">local_hospital</span>
+                            Programs
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="search-bar">
+                    <span class="material-icons">search</span>
+                    <input type="text" placeholder="Search clients, programs...">
+                </div>
+                <div class="user-menu">
+                  
+                    <div class="user-profile">
+                        <img src="{{ doctor_data.profile_image or url_for('static', filename='/images/landing.jpg') }}" alt="Doctor's profile">
+                        <span>Dr. {{ doctor_data.first_name }} {{ doctor_data.last_name }}</span>
+                        <span class="material-icons">arrow_drop_down</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Overview Section -->
+                <section id="dashboard-overview" class="content-section">
+                    <h2>Dashboard Overview</h2><br><br>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon patients">
+                                <span class="material-icons">people</span>
+                            </div>
+                            <div class="stat-details">
+                                <h3>Total Clients</h3>
+                                <p class="stat-number">{{ stats.total_clients }}</p>
+                                <p class="stat-change positive">+5% from last month</p>
+                            </div>
+                        </div>
+                       
+                        <div class="stat-card">
+                            <div class="stat-icon programs">
+                                <span class="material-icons">local_hospital</span>
+                            </div>
+                            <div class="stat-details">
+                                <h3>Active Programs</h3>
+                                <p class="stat-number">{{ stats.active_programs }}</p>
+                                
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="recent-activity">
+                        <h3>Recent Activity</h3>
+                        <div class="activity-list">
+                            {% for activity in recent_activities %}
+                            <div class="activity-item">
+                                <div class="activity-icon">
+                                    <span class="material-icons">{{ activity.icon }}</span>
+                                </div>
+                                <div class="activity-details">
+                                    <p class="activity-title">{{ activity.title }}</p>
+                                    <p class="activity-time">{{ activity.time }}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Clients Section -->
+                <section id="clients" class="content-section hidden">
+                    <div class="section-header">
+                        <h2>Clients</h2>
+                        <button class="add-new-btn" onclick="showAddClientModal()">
+                            <span class="material-icons">add</span>
+                            Add New Client
+                        </button>
+                    </div>
+                    <div class="clients-list">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>D.O.B</th>
+                                    <th>Gender</th>
+                                    <th>Email</th>
+                                    <th>Address</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for client in clients %}
+                                <tr>
+                                    <td>{{ client.id }}</td>
+                                    <td>{{ client.first_name + client.last_name }}</td>
+                                    <td>{{ client.date_of_birth }}</td>
+                                    <td>{{ client.gender }}</td>
+                                    <td>{{ client.email }}</td>
+                                    <td>{{ client.address }}</td>
+                                    <td>
+                                        <a href="{{ url_for('view_client', client_id=client.id) }}" class="action-btn">
+                                            <span class="material-icons">visibility</span>
+                                        </a>
+                                    
+                                        <!-- Delete Client Button -->
+                                        <form action="{{ url_for('delete_client', client_id=client.id) }}" method="POST" style="display:inline;">
+                                            <button type="submit" class="action-btn" onclick="return confirm('Are you sure you want to delete this client?');">
+                                                <span class="material-icons">delete</span>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                <!-- Enroll Clients Section -->
+                <section id="enrollclients" class="content-section hidden">
+                    <div class="section-header">
+                        <h2 class="m-0">Enroll Client to Program</h2>
+                      
+                    </div>
+                    
+                    <!-- Modal Content -->
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                          <div class="container-fluid py-4">
+                            <h2 class="text-center mb-4">Enroll Client to Program</h2>
+                      
+                            <form method="POST">
+                              <div class="row mb-4">
+                                <div class="col-6">
+                                  <label for="program_id" class="form-label">Select Program</label>
+                                  <select class="form-select" id="program_id" name="program_id" required>
+                                    <option value="" disabled selected>Select Program</option>
+                                    {% for program in programs %}
+                                      <option value="{{ program.id }}">{{ program.name }}</option>
+                                    {% endfor %}
+                                  </select>
+                                </div>
+                      
+                                <div class="col-6">
+                                  <label for="national_id" class="form-label">Select Client</label>
+                                  <select class="form-select" id="national_id" name="national_id" required>
+                                    <option value="" disabled selected>Select Client</option>
+                                    {% for client in clients %}
+                                      <option value="{{ client.national_id }}">{{ client.national_id }} - {{ client.name }}</option>
+                                    {% endfor %}
+                                  </select>
+                                </div>
+                              </div>
+                                
+
+                                <!-- Client Info Card (hidden initially) -->
+                                <div id="client-info-card" class="card mb-4" style="display: none;">
+                                    <div class="card-body">
+                                        <h5 class="card-title" id="client-name"></h5>
+                                        <p class="card-text" id="client-dob"></p>
+                                        <p class="card-text" id="client-gender"></p>
+                                        <p class="card-text" id="client-email"></p>
+                                        <p class="card-text" id="client-address"></p>
+                                    </div>
+                                </div>
+
+                                <!-- Enrollment Date -->
+                                <div class="mb-4">
+                                    <label for="enrollment_date" class="form-label">Enrollment Date</label>
+                                    <input type="date" class="form-control" id="enrollment_date" name="enrollment_date" required>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="mb-4 text-center">
+                                    
+                                    <button type="submit" class="btn btn-primary">
+                                        <span class="material-icons">add</span>
+                          
+                            Enroll Client</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                </section>
+
+
+
+                <!-- Programs Section -->
+                <section id="programs" class="content-section hidden">
+                    <div class="section-header">
+                        <h2>Health Programs</h2>
+                        <button class="add-new-btn" onclick="showAddProgramModal()">
+                            <span class="material-icons">add</span>
+                            Create New Program
+                        </button>
+                    </div>
+                    <div class="programs-grid">
+                        {% if programs %}
+                        {% for program in programs %}
+                        <div class="program-card">
+                            <div class="program-header">
+                                <h3>{{ program.name }}</h3>
+                                <span class="program-status {{ program.status }}">{{ program.status }}</span>
+                            </div>
+                            <p class="program-description">{{ program.description }}</p>
+                            <div class="program-stats">
+                                <div class="stat">
+                                    <span class="material-icons">people</span>
+                                    <p>{{ program.enrolled_clients }} Clients</p>
+                                </div>
+                                <div class="stat">
+                                    <span class="material-icons">event</span>
+                                    <p>{{ program.duration }}</p>
+                                </div>
+                            </div>
+                            <div class="program-actions">
+                                <a href="{{ url_for('view_program', program_id=program.id) }}">
+                                    <button>View Details</button>
+                                </a>
+                                <a href="{{ url_for('edit_program', program_id=program.id) }}">
+                                    <button>Edit</button>
+                                </a>
+                            </div>
+                            
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="no-programs">
+                            <p>No programs available.</p>
+                            </div>
+                        {% endif %}
+
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="addClientModal" tabindex="-1" aria-labelledby="addClientModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg"> <!-- Broad modal -->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="addClientModalLabel" style="color: chocolate;">Add New Client</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal('addClientModal')"></button>
+      </div>
+
+      <form id="addClientForm" class="p-4">
+        <div class="card shadow-sm p-4">
+          <div class="row g-3">
+            <!-- First Name -->
+            <div class="col-md-6">
+              <label for="first_name" class="form-label">First Name</label>
+              <input type="text" class="form-control" id="first_name" name="first_name" required>
+            </div>
+
+            <!-- Last Name -->
+            <div class="col-md-6">
+              <label for="last_name" class="form-label">Last Name</label>
+              <input type="text" class="form-control" id="last_name" name="last_name" required>
+            </div>
+
+            <!-- National ID -->
+            <div class="col-md-6">
+              <label for="national_id" class="form-label">National ID</label>
+              <input type="text" class="form-control" id="national_id" name="national_id" required>
+            </div>
+
+            <!-- Phone Number -->
+            <div class="col-md-6">
+              <label for="phone_number" class="form-label">Phone Number</label>
+              <input type="tel" class="form-control" id="phone_number" name="phone_number" required>
+            </div>
+
+            <!-- Date of Birth -->
+            <div class="col-md-6">
+              <label for="date_of_birth" class="form-label">Date of Birth</label>
+              <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" required>
+            </div>
+
+            <!-- Gender -->
+            <div class="col-md-6">
+              <label for="gender" class="form-label">Gender</label>
+              <select class="form-select" id="gender" name="gender" required>
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
+
+            <!-- Contact Number -->
+            <div class="col-md-6">
+              <label for="contact_number" class="form-label">Contact Number</label>
+              <input type="tel" class="form-control" id="contact_number" name="contact_number">
+            </div>
+
+            <!-- Email -->
+            <div class="col-md-6">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" name="email">
+            </div>
+
+            <!-- Address -->
+            <div class="col-md-12">
+              <label for="address" class="form-label">Address</label>
+              <input type="text" class="form-control" id="address" name="address">
+            </div>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="text-end mt-4">
+            <button type="button" class="btn btn-secondary me-2" onclick="closeModal('addClientModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Client</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+    <script src="/static/scripts/dashboard.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
