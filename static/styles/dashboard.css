@@ -140,7 +140,7 @@ body {
 }
 
 .stat-card {
-    background-color: #fff;
+    background-color: #9fe0f3;
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -182,8 +182,8 @@ body {
 }
 
 .stat-number {
-    font-size: 1.8rem;
-    font-weight: bold;
+    font-size: 1.0rem;
+    font-weight: semibold;
     margin-bottom: 5px;
 }
 
@@ -227,7 +227,7 @@ body {
 }
 
 .activity-details .activity-title {
-    font-size: 0.9rem;
+    font-size: 1.0rem;
     margin-bottom: 5px;
 }
 
@@ -266,7 +266,7 @@ body {
 /* Program Cards */
 .programs-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
 }
 
@@ -286,18 +286,18 @@ body {
 
 .program-status {
     padding: 5px 10px;
-    border-radius: 15px;
+    border-radius: 2px;
     font-size: 0.8rem;
 }
 
 .program-status.active {
-    background-color: #e3fcef;
-    color: #00b894;
+    background-color: #037030;
+    color: #f1f7f2;
 }
 
-.program-status.pending {
-    background-color: #ffeaa7;
-    color: #fdcb6e;
+.program-status.closed {
+    background-color: #46020b;
+    color: #fcfaf8;
 }
 
 .program-description {
@@ -492,3 +492,40 @@ body {
 .action-btn:hover {
     color: #2d3436;
 }
+
+.fancy-header {
+    font-family: 'Playfair Display', serif;
+    color: #5f27cd;
+    font-weight: 400;
+    font-size: 1.8rem;
+    text-shadow: 1px 1px 3px rgba(95, 39, 205, 0.2);
+  }
+  
+  .fancy-subheader {
+    font-family: 'Satisfy', cursive;
+    color: #10ac84;
+    font-size: 1.8rem;
+  }
+  
+  .result-row {
+    gap: 2rem;
+  }
+  
+  .table {
+    font-size: 0.95rem;
+  }
+  
+  .card img {
+    border-radius: 1rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  #client-list tr:hover {
+    background-color: #05812a;
+    cursor: pointer;
+  }
+  
+  #program-list tr:hover {
+    background-color: #05812a;
+    cursor: pointer;
+  }

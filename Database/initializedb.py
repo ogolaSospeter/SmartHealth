@@ -34,8 +34,10 @@ def init_db():
             estimated_clients INTEGER NOT NULL,
             require_referral BOOLEAN DEFAULT 0,
             follow_up BOOLEAN DEFAULT 0,
+            status TEXT DEFAULT 'active',
             created_by INTEGER,
             FOREIGN KEY (created_by) REFERENCES doctors(id)
+                             
         );
 
         -- Milestones table
@@ -65,9 +67,9 @@ def init_db():
             last_name TEXT NOT NULL,
             date_of_birth DATE NOT NULL,
             gender TEXT NOT NULL,
+            national_id INTEGER NOT NULL,
             contact_number TEXT,
             email TEXT UNIQUE,
-                             national_id TEXT UNIQUE,
             address TEXT
         );
 

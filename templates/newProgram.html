@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Health Program - Smart Health System</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="/static/styles/newprogram.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10">
+                <div class="program-card p-4 p-md-5">
+                    <h1 class="section-title text-center mb-4">Create Health Program</h1>
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                      {% for category, message in messages %}
+                      <div class="alert alert-{{ category }} d-flex align-items-center" role="alert">
+                        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+                        <div>
+                            {{ message }}
+                        </div>
+                      </div>
+                       
+                      {% endfor %}
+                    {% endif %}
+                  {% endwith %}
+                    <form id="createProgramForm" method="POST" action="{{ url_for('add_new_health_program') }}">
+                        <!-- Basic Information -->
+                        <div class="mb-4">
+                            <h3 class="h5 mb-3">Basic Information</h3>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="programName" class="form-label required-field">Program Name</label>
+                                    <input type="text" class="form-control" id="programName" name="programName">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="programType" class="form-label required-field">Program Type</label>
+                                    <select class="form-select" id="programType" name="programType" required>
+                                        <option value="" selected disabled>Select Program Type</option>
+                                        <option value="infectious">Infectious Disease</option>
+                                        <option value="chronic">Chronic Disease</option>
+                                        <option value="maternal">Maternal Health</option>
+                                        <option value="pediatric">Pediatric Care</option>
+                                        <option value="mental">Mental Health</option>
+                                        <option value="preventive">Preventive Care</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label for="description" class="form-label required-field">Program Description</label>
+                                    <textarea class="form-control" id="description" rows="3" name="description" required></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Timeline -->
+                        <div class="mb-4">
+                            <h3 class="h5 mb-3">Program Timeline</h3>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="startDate" class="form-label required-field">Start Date</label>
+                                    <input type="date" class="form-control" id="startDate" name="startDate" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="endDate" class="form-label">End Date (Optional)</label>
+                                    <input type="date" class="form-control" id="endDate" name="endDate" >
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Target Information -->
+                        <div class="mb-4">
+                            <h3 class="h5 mb-3">Target Information</h3>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="targetGroup" class="form-label required-field">Target Group</label>
+                                    <select class="form-select" id="targetGroup" name="targetGroup" required>
+                                        <option value="" selected disabled>Select Target Group</option>
+                                        <option value="all">General Population</option>
+                                        <option value="children">Children (0-14)</option>
+                                        <option value="youth">Youth (15-24)</option>
+                                        <option value="adults">Adults (25-64)</option>
+                                        <option value="elderly">Elderly (65+)</option>
+                                        <option value="pregnant">Pregnant Women</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="estimatedPatients" class="form-label required-field">Estimated Clients</label>
+                                    <input type="number" class="form-control" id="estimatedClients" name="estimatedClients" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Milestones -->
+                        <div class="mb-4">
+                            <h3 class="h5 mb-3">Program Milestones</h3>
+                            <div id="milestonesContainer">
+                                <div class="milestone-card">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label required-field">Milestone Title</label>
+                                            <input type="text" class="form-control" name="milestone_title[]" required >
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label required-field">Target Date</label>
+                                            <input type="date" class="form-control" name="milestone_date[]" required>
+                                        </div>
+                                        <div class="col-md-2 d-flex align-items-end">
+                                            <button type="button" class="btn btn-link text-danger remove-btn">Remove</button>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label">Description</label>
+                                            <textarea class="form-control" rows="2" name="milestone_description[]"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="add-milestone-btn">
+                                + Add Milestone
+                            </button>
+                        </div>
+
+                        <!-- Resources -->
+                        <div class="mb-4">
+                            <h3 class="h5 mb-3">Required Resources</h3>
+                            <div id="resourcesContainer">
+                                <div class="resource-item">
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label required-field">Resource Type</label>
+                                            <select class="form-select" name="resource_type[]" required>
+                                                <option value="" selected disabled>Select Type</option>
+                                                <option value="staff">Medical Staff</option>
+                                                <option value="equipment">Equipment</option>
+                                                <option value="medicine">Medicine</option>
+                                                <option value="facility">Facility</option>
+                                                <option value="others">Others</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label required-field">Quantity</label>
+                                            <input type="number" class="form-control" name="resource_quantity[]" required>
+                                        </div>
+                                        <div class="col-md-4 d-flex align-items-end">
+                                            <button type="button" class="btn btn-link text-danger remove-btn">Remove</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="add-resource-btn">
+                                + Add Resource
+                            </button>
+                        </div>
+
+                        <!-- Additional Settings -->
+                        <div class="mb-4">
+                            <h3 class="h5 mb-3">Additional Settings</h3>
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="requireReferral" name="requireReferral">
+                                        <label class="form-check-label" for="requireReferral">
+                                            Require Medical Referral
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="followUp" name="followUp">
+                                        <label class="form-check-label" for="followUp">
+                                            Include Follow-up Schedule
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--Button to Navigate back-->
+                        <div class="d-flex gap-2 justify-content-center">
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Back to Home</a>
+                        <!-- Submit Buttons -->
+                        <div class="d-flex gap-2 justify-content-end">
+                            <button type="submit" class="btn btn-primary">Create Program</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+   <!--
+   The Inline Javascript below is meant to help add more entries of the milestones and the resources. 
+   -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add Milestone
+            document.querySelector('.add-milestone-btn').addEventListener('click', function() {
+                const template = document.querySelector('.milestone-card').cloneNode(true);
+                template.querySelector('input').value = '';
+                document.getElementById('milestonesContainer').appendChild(template);
+            });
+
+            // Add Resource
+            document.querySelector('.add-resource-btn').addEventListener('click', function() {
+                const template = document.querySelector('.resource-item').cloneNode(true);
+                template.querySelector('select').selectedIndex = 0;
+                template.querySelector('input').value = '';
+                document.getElementById('resourcesContainer').appendChild(template);
+            });
+
+            // Remove buttons
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('remove-btn')) {
+                    const parent = e.target.closest('.milestone-card, .resource-item');
+                    if (parent) {
+                        parent.remove();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

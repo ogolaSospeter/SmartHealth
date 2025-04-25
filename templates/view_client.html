@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Client Details</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet"/>
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .icon-wrapper {
+      font-size: 3rem;
+      color: #0d6efd;
+    }
+    .section-header {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 1rem;
+    }
+    .card {
+      border-radius: 0.75rem;
+    }
+    .btn-outline-secondary:hover {
+      background-color: #f1f1f1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="container mt-3">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show d-flex align-items-center" role="alert">
+          <i class="bi {{ 'bi-check-circle-fill' if category == 'success' else 'bi-exclamation-triangle-fill' }} me-2"></i>
+          <div>{{ message }}</div>
+          <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="container my-4">
+<style>
+  .enrollment-status {
+    padding: 5px 10px;
+    border-radius: 2px;
+    font-size: 0.8rem;
+}
+
+.enrollment-status.active {
+    background-color: #037030;
+    color: #f1f7f2;
+}
+
+.enrollment-status.closed {
+    background-color: #46020b;
+    color: #fcfaf8;
+}
+</style>
+    <!-- Client Information -->
+    <div class="card mb-4">
+      <div class="card-body text-center">
+        <i class="bi bi-person-circle icon-wrapper mb-3"></i>
+        <h2 class="mb-3">{{ client.first_name }} {{ client.last_name }}</h2>
+        <p><strong>D.O.B:</strong> {{ client.date_of_birth }}</p>
+        <p><strong>Gender:</strong> {{ client.gender }}</p>
+        <p><strong>Email:</strong> {{ client.email }}</p>
+        <p><strong>Address:</strong> {{ client.address }}</p>
+      </div>
+    </div>
+
+    <!-- Enrollments -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="section-header">
+          <i class="bi bi-journal-text me-2"></i> Enrolled Programs
+        </div>
+        {% if enrollments %}
+          <div class="table-responsive">
+            <table class="table table-hover table-striped">
+              <thead class="table-light">
+                <tr>
+                  <th>Program Name</th>
+                  <th>Start Date</th>
+                  <th>End Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for enrollment in enrollments %}
+                <tr>
+                  <td>{{ enrollment.name }}</td>
+                  <td>{{ enrollment.start_date }}</td>
+                  <td>{{ enrollment.end_date or 'Ongoing' }}</td>
+                  <td><span class="enrollment-status {{enrollment.status }}">{{enrollment.status }}</span></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-muted">No programs enrolled.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Milestones -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="section-header">
+          <i class="bi bi-check-circle me-2"></i> Milestones
+        </div>
+        {% if milestones %}
+          <div class="table-responsive">
+            <table class="table table-hover table-striped">
+              <thead class="table-light">
+                <tr>
+                  <th>Title</th>
+                  <th>Target Date</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for milestone in milestones %}
+                <tr>
+                  <td>{{ milestone.title }}</td>
+                  <td>{{ milestone.target_date }}</td>
+                  <td>{{ milestone.description }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-muted">No milestones added.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Resources -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="section-header">
+          <i class="bi bi-currency-dollar me-2"></i> Resources
+        </div>
+        {% if resources %}
+          <div class="table-responsive">
+            <table class="table table-hover table-striped">
+              <thead class="table-light">
+                <tr>
+                  <th>Resource Type</th>
+                  <th>Quantity</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for resource in resources %}
+                <tr>
+                  <td>{{ resource.resource_type }}</td>
+                  <td>{{ resource.quantity }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-muted">No resources listed.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="d-flex justify-content-center">
+      <a href="{{ url_for('dashboard') }}" class="btn " style="background-color: cyan;">
+        <i class="bi bi-arrow-left-circle me-1"></i> Back to Clients List
+      </a>
+    </div>
+
+  </div>
+
+  <script src="/static/scripts/alerts.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doctor Dashboard</title>
     <link rel="stylesheet" href="/static/styles/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&family=Satisfy&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEJt3WvL7aA4n5M1Ke8anD3i0Hz6Hg0F3AzZsjzUGnV0x6C3ZmP5nKtbOljw6" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -46,80 +47,193 @@
                             Programs
                         </a>
                     </li>
+                  
                 </ul>
             </nav>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+              <div class="alert alert-{{ category }} d-flex align-items-center" role="alert">
+                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+                <div>
+                    {{ message }}
+                </div>
+              </div>
+               
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
             <!-- Top Header -->
             <header class="top-header">
-                <div class="search-bar">
-                    <span class="material-icons">search</span>
-                    <input type="text" placeholder="Search clients, programs...">
+                <div class="container mt-4">
+                    <div class="row">
+                        <!-- Client Search -->
+                        <div class="col-md-6 mb-3">
+                            <div class="input-group">
+                                <input type="text" id="client-search-input" class="form-control" placeholder="Search clients..." oninput="searchClients()">
+                               
+                            </div>
+                        </div>
+                
+                        <!-- Program Search -->
+                        <div class="col-md-6 mb-3">
+                            <div class="input-group">
+                                <input type="text" id="program-search-input" class="form-control" placeholder="Search programs..." oninput="searchPrograms()">
+                                
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="user-menu">
-                  
+                <div class="user-menu">                    
                     <div class="user-profile">
                         <img src="{{ doctor_data.profile_image or url_for('static', filename='/images/landing.jpg') }}" alt="Doctor's profile">
                         <span>Dr. {{ doctor_data.first_name }} {{ doctor_data.last_name }}</span>
-                        <span class="material-icons">arrow_drop_down</span>
+                        <a href="{{ url_for('signOut') }}"><span class="material-icons">logout</span></a>
                     </div>
                 </div>
             </header>
 
             <!-- Dashboard Content -->
             <div class="dashboard-content">
-                <!-- Overview Section -->
-                <section id="dashboard-overview" class="content-section">
-                    <h2>Dashboard Overview</h2><br><br>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon patients">
-                                <span class="material-icons">people</span>
-                            </div>
-                            <div class="stat-details">
-                                <h3>Total Clients</h3>
-                                <p class="stat-number">{{ stats.total_clients }}</p>
-                                <p class="stat-change positive">+5% from last month</p>
-                            </div>
+              <!-- Search Results Row -->
+              <!-- Google Fonts in your <head> -->
+
+            <!-- Search Results Section -->
+            <section id="search-results" class="content-section hidden py-5">
+            <div class="section-header text-center mb-4">
+                <h2 class="fancy-header">Search Results</h2>
+            </div>
+
+            <div class="container">
+                <div class="row justify-content-center gap-4 result-row">
+
+                <!-- Clients -->
+                <div class="col-12 result-item" id="client-result">
+                    <div class="card shadow p-4 border-0 rounded-4 bg-light h-100">
+                    <h3 class="text-center fancy-subheader mb-3">Clients</h3>
+                    <table class="table table-striped table-hover border rounded" id="client-list">
+                        <!-- The Clients will be populated here dynamically -->
+                    </table>
+
+                    <!-- No Client Found error display safe handling -->
+                    <div id="no-client-card" class="card text-center mt-3 d-none border-0 bg-white shadow-sm">
+                        <div class="card-body">
+                        <img src="https://img.freepik.com/premium-vector/woman-holding-banner-with-stop-prohibition-sign-demonstration-protest-3d-vector-people-character_365941-1175.jpg?w=740" alt="No client found" class="img-fluid" style="max-width: 150px;">
+                        <h5 class="mt-3 text-muted">No such client found</h5>
                         </div>
-                       
-                        <div class="stat-card">
-                            <div class="stat-icon programs">
-                                <span class="material-icons">local_hospital</span>
-                            </div>
-                            <div class="stat-details">
-                                <h3>Active Programs</h3>
-                                <p class="stat-number">{{ stats.active_programs }}</p>
-                                
-                            </div>
+                    </div>
+                    </div>
+                </div>
+
+                <!-- Programs -->
+                <div class="col-12 result-item hidden" id="program-result">
+                    <div class="card shadow p-4 border-0 rounded-4 bg-light h-100">
+                    <h3 class="text-center fancy-subheader mb-3">Programs</h3>
+                    <table class="table table-striped table-hover border rounded" id="program-list">
+                        <!-- The programs will be populated here dynamically -->
+                    </table>
+
+                    <!-- No Program Found display content -->
+                    <div id="no-program-card" class="card text-center mt-3 d-none border-0 bg-white shadow-sm">
+                        <div class="card-body">
+                        <img src="https://img.freepik.com/free-vector/hand-drawn-no-data-concept_52683-127829.jpg?t=st=1745603264~exp=1745606864~hmac=f14fd1402016173e5f912fbd7203b1611881765a2c56743192cf529b6323c7ad&w=740" alt="No program found" class="img-fluid" style="max-width: 150px;">
+                        <h5 class="mt-3 text-muted">No such program found</h5>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+
+                </div>
+            </div>
+            </section>
+
+            
+               <!-- Overview Section -->
+            <section id="dashboard-overview" class="content-section">
+                <h4>Dashboard Overview</h4><br><br>
+                <div class="stats-grid">
+                    <!-- Total Clients -->
+                    <div class="stat-card">
+                        <div class="stat-icon patients">
+                            <span class="material-icons">people</span>
+                        </div>
+                        <div class="stat-details">
+                            <h3>Total Clients</h3>
+                            <p class="stat-number">{{ stats.total_clients }}</p>
+                            
                         </div>
                     </div>
 
-                    <!-- Recent Activity -->
-                    <div class="recent-activity">
-                        <h3>Recent Activity</h3>
-                        <div class="activity-list">
-                            {% for activity in recent_activities %}
-                            <div class="activity-item">
-                                <div class="activity-icon">
-                                    <span class="material-icons">{{ activity.icon }}</span>
-                                </div>
-                                <div class="activity-details">
-                                    <p class="activity-title">{{ activity.title }}</p>
-                                    <p class="activity-time">{{ activity.time }}</p>
-                                </div>
-                            </div>
-                            {% endfor %}
+                    <!-- Active Programs -->
+                    <div class="stat-card">
+                        <div class="stat-icon programs">
+                            <span class="material-icons">local_hospital</span>
+                        </div>
+                        <div class="stat-details">
+                            <h3>Active Programs</h3>
+                            <p class="stat-number">{{ stats.active_programs }}</p>
+                        
                         </div>
                     </div>
-                </section>
+
+                    <!-- Clients by Gender -->
+                    <div class="stat-card">
+                        <div class="stat-icon gender">
+                            <span class="material-icons">male</span>
+                            <span class="material-icons">female</span>
+                        </div>
+                        <div class="stat-details">
+                            <h3>Clients by Gender</h3>
+                            <p class="stat-number">{{ stats.male_clients }} Male</p>
+                            <p class="stat-number">{{ stats.female_clients }} Female</p>
+                        
+                        </div>
+                    </div>
+
+                    <!-- Clients by Age Group -->
+                    <div class="stat-card">
+                        <div class="stat-icon age-group">
+                            <span class="material-icons">group</span>
+                        </div>
+                        <div class="stat-details">
+                            <h3>Clients by Age Group</h3>
+                            <p class="stat-number">{{ stats.age_group_18_35 }} (18-35)</p>
+                            <p class="stat-number">{{ stats.age_group_36_50 }} (36-50)</p>
+                            <p class="stat-number">{{ stats.age_group_51_plus }} (51+)</p>
+                        </div>
+                    </div>
+                </div>
+
+            <!-- Recent Programs-->
+            <div class="recent-activity">
+                <h3>Closed and Active Programs</h3>
+                <div class="activity-list">
+                    {% for program in programs %}
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <span class="material-icons">local_hospital</span>
+                        </div>
+                        <div class="activity-details">
+                            <p class="activity-title">{{ program.name }}</p>
+                            <p class="activity-time">Started on: {{ program.start_date }}</p>
+                            <span class="program-status {{ program.status }}">{{ program.status }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            </section>
+
+
 
                 <!-- Clients Section -->
                 <section id="clients" class="content-section hidden">
                     <div class="section-header">
-                        <h2>Clients</h2>
+                        <h3 class="fancy-header text-center mb-4">Clients</h3>
                         <button class="add-new-btn" onclick="showAddClientModal()">
                             <span class="material-icons">add</span>
                             Add New Client
@@ -167,18 +281,18 @@
                 </section>
                 <!-- Enroll Clients Section -->
                 <section id="enrollclients" class="content-section hidden">
-                    <div class="section-header">
-                        <h2 class="m-0">Enroll Client to Program</h2>
-                      
-                    </div>
-                    
-                    <!-- Modal Content -->
+                                        <!-- Modal Content -->
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                           <div class="container-fluid py-4">
-                            <h2 class="text-center mb-4">Enroll Client to Program</h2>
+                            <h2 class="fancy-header text-center mb-4">Enroll Client to Program</h2>
+                            <div class="text-center mb-4">
+                                <img src="https://img.freepik.com/free-vector/hand-drawn-essay-illustration_23-2150268421.jpg?ga=GA1.1.964425131.1740758158&semt=ais_hybrid&w=740" alt="Enroll Client Illustration" class="img-fluid" style="max-width: 200px; max-height: 200px; border-radius: 50%;">
+                                <p class="mt-3">Easily enroll clients into programs by selecting the desired program and client details below. Ensure all information is accurate before submission.</p>
+                            </div>
+                            <hr><br>
                       
-                            <form method="POST">
+                            <form method="POST"  action="{{ url_for('enroll_client') }}" id="enroll-client-form">
                               <div class="row mb-4">
                                 <div class="col-6">
                                   <label for="program_id" class="form-label">Select Program</label>
@@ -195,7 +309,7 @@
                                   <select class="form-select" id="national_id" name="national_id" required>
                                     <option value="" disabled selected>Select Client</option>
                                     {% for client in clients %}
-                                      <option value="{{ client.national_id }}">{{ client.national_id }} - {{ client.name }}</option>
+                                      <option value="{{ client.national_id }}">{{ client.national_id }}</option>
                                     {% endfor %}
                                   </select>
                                 </div>
@@ -204,12 +318,12 @@
 
                                 <!-- Client Info Card (hidden initially) -->
                                 <div id="client-info-card" class="card mb-4" style="display: none;">
-                                    <div class="card-body">
+                                    <div class="card-body" style="background-color: bisque;">
                                         <h5 class="card-title" id="client-name"></h5>
                                         <p class="card-text" id="client-dob"></p>
                                         <p class="card-text" id="client-gender"></p>
                                         <p class="card-text" id="client-email"></p>
-                                        <p class="card-text" id="client-address"></p>
+                                        <p class="card-text" id="client-phone"></p>
                                     </div>
                                 </div>
 
@@ -231,14 +345,12 @@
                         </div>
                     </div>
                 </div>
-                </section>
-
-
-
-                <!-- Programs Section -->
+            </section>
+                
+                           <!-- Programs Section -->
                 <section id="programs" class="content-section hidden">
                     <div class="section-header">
-                        <h2>Health Programs</h2>
+                        <h4 class="fancy-header">Health Programs</h4>
                         <button class="add-new-btn" onclick="showAddProgramModal()">
                             <span class="material-icons">add</span>
                             Create New Program
@@ -249,26 +361,32 @@
                         {% for program in programs %}
                         <div class="program-card">
                             <div class="program-header">
-                                <h3>{{ program.name }}</h3>
+                                <h4>{{ program.name }}</h4>
                                 <span class="program-status {{ program.status }}">{{ program.status }}</span>
                             </div>
                             <p class="program-description">{{ program.description }}</p>
-                            <div class="program-stats">
+                            <div class="program-stats ">
                                 <div class="stat">
                                     <span class="material-icons">people</span>
                                     <p>{{ program.enrolled_clients }} Clients</p>
                                 </div>
                                 <div class="stat">
-                                    <span class="material-icons">event</span>
-                                    <p>{{ program.duration }}</p>
+                                    <span class="material-icons">event</span><br>
+                                    <p>{{ program.start_date}}   --   {{program.end_date}}</p>
                                 </div>
                             </div>
-                            <div class="program-actions">
+                            <div class="program-actions" style="display: flex; justify-content: center; gap: 15px; margin-top: 20px;">
                                 <a href="{{ url_for('view_program', program_id=program.id) }}">
-                                    <button>View Details</button>
+                                    <button style="background-color: #2196f3; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                                        <span class="material-icons" style="vertical-align: middle; font-size: 18px; margin-right: 5px;">visibility</span>
+                                        View
+                                    </button>
                                 </a>
                                 <a href="{{ url_for('edit_program', program_id=program.id) }}">
-                                    <button>Edit</button>
+                                    <button style="background-color: #4caf50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                                        <span class="material-icons" style="vertical-align: middle; font-size: 18px; margin-right: 5px;">edit</span>
+                                        Edit
+                                    </button>
                                 </a>
                             </div>
                             
@@ -296,8 +414,20 @@
         <h4 class="modal-title" id="addClientModalLabel" style="color: chocolate;">Add New Client</h4>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeModal('addClientModal')"></button>
       </div>
-
-      <form id="addClientForm" class="p-4">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} d-flex align-items-center" role="alert">
+          <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+          <div>
+              {{ message }}
+          </div>
+        </div>
+         
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+      <form id="addClientForm" class="p-4"action="{{ url_for('add_new_client') }}" method="POST">
         <div class="card shadow-sm p-4">
           <div class="row g-3">
             <!-- First Name -->
@@ -340,16 +470,10 @@
               </select>
             </div>
 
-            <!-- Contact Number -->
-            <div class="col-md-6">
-              <label for="contact_number" class="form-label">Contact Number</label>
-              <input type="tel" class="form-control" id="contact_number" name="contact_number">
-            </div>
-
             <!-- Email -->
             <div class="col-md-6">
               <label for="email" class="form-label">Email</label>
-              <input type="email" class="form-control" id="email" name="email">
+              <input type="email" class="form-control" id="email" name="email" style="width: max-content;">
             </div>
 
             <!-- Address -->
@@ -369,9 +493,11 @@
     </div>
   </div>
 </div>
-
+    <script src="/static/scripts/alerts.js"></script>
     <script src="/static/scripts/dashboard.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
 
 </body>
 </html>

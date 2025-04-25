@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Program - {{ program.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <style>
+        .program-status {
+          padding: 5px 10px;
+          border-radius: 2px;
+          font-size: 0.8rem;
+      }
+      
+      .program-status.active {
+          background-color: #037030;
+          color: #f1f7f2;
+      }
+      
+      .program-status.closed {
+          background-color: #46020b;
+          color: #fcfaf8;
+      }
+      </style>
+    <div class="container mt-5">
+        <div class="card shadow">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} d-flex align-items-center" role="alert">
+          <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+          <div>
+              {{ message }}
+          </div>
+        </div>
+         
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+            <div class="card-header bg-primary text-white">
+                <h4>Edit Health Program - {{ program.name }}</h4>
+            </div>
+            <form action="{{ url_for('update_program', program_id=program.id) }}" method="POST">
+                <div class="card-body">
+
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="name" class="form-label">Program Name</label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ program.name }}" required>
+                        </div>
+                        <div class="col">
+                            <label for="program_type" class="form-label">Program Type</label>
+                            <input type="text" class="form-control" id="program_type" name="program_type" value="{{ program.program_type }}" required>
+                        </div>
+                        <div class="col">
+                            <label for="status" class="form-label">Program Status</label><br>
+                            <span class="program-status {{program.status }}">    {{program.status }}</span>
+                              </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="5">{{ program.description }}</textarea>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="start_date" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date" value="{{ program.start_date }}">
+                        </div>
+                        <div class="col">
+                            <label for="end_date" class="form-label">End Date</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date" value="{{ program.end_date }}">
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="target_group" class="form-label">Target Group</label>
+                            <input type="text" class="form-control" id="target_group" name="target_group" value="{{ program.target_group }}">
+                        </div>
+                        <div class="col">
+                            <label for="estimated_clients" class="form-label">Estimated Clients</label>
+                            <input type="number" class="form-control" id="estimated_clients" name="estimated_clients" value="{{ program.estimated_clients }}">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="status" class="form-label">Program Status  <i>"Active" or "Closed"</i></label>
+                            <input type="text" class="form-control" id="status" name="status" value="{{ program.status }}">
+                        </div>
+                        <div class="col">
+                            <label for="estimated_clients" class="form-label"></label>
+                            <input type="" class="form-control" id="" name="" value="">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col form-check">
+                            <input class="form-check-input" type="checkbox" name="require_referral" id="require_referral" {% if program.require_referral %}checked{% endif %}>
+                            <label class="form-check-label" for="require_referral">Requires Referral</label>
+                        </div>
+                        <div class="col form-check">
+                            <input class="form-check-input" type="checkbox" name="follow_up" id="follow_up" {% if program.follow_up %}checked{% endif %}>
+                            <label class="form-check-label" for="follow_up">Follow-Up Required</label>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h5>Milestones</h5>
+                    {% for milestone in milestones %}
+                        <div class="border p-3 mb-2 rounded">
+                            <input type="hidden" name="milestones[{{ loop.index0 }}][id]" value="{{ milestone.id }}">
+                            <div class="mb-2">
+                                <label class="form-label">Title</label>
+                                <input type="text" class="form-control" name="milestones[{{ loop.index0 }}][title]" value="{{ milestone.title }}">
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Target Date</label>
+                                <input type="date" class="form-control" name="milestones[{{ loop.index0 }}][target_date]" value="{{ milestone.target_date }}">
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" name="milestones[{{ loop.index0 }}][description]">{{ milestone.description }}</textarea>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p>No milestones found.</p>
+                    {% endfor %}
+
+                    <hr>
+
+                    <h5>Resources</h5>
+                    {% for resource in resources %}
+                        <div class="border p-3 mb-2 rounded">
+                            <input type="hidden" name="resources[{{ loop.index0 }}][id]" value="{{ resource.id }}">
+                            <div class="mb-2">
+                                <label class="form-label">Resource Type</label>
+                                <input type="text" class="form-control" name="resources[{{ loop.index0 }}][resource_type]" value="{{ resource.resource_type }}">
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Quantity</label>
+                                <input type="number" class="form-control" name="resources[{{ loop.index0 }}][quantity]" value="{{ resource.quantity }}">
+                            </div>
+                        </div>
+                    {% else %}
+                        <p>No resources found.</p>
+                    {% endfor %}
+
+                </div>
+                <div class="card-footer text-end">
+                    <a href="{{ url_for('view_program', program_id=program.id) }}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-success">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/scripts/alerts.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
