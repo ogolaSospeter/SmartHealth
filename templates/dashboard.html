@@ -16,7 +16,7 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <img src="/static/images/landing.jpg" alt="Health System Logo" class="logo">
+                <img src="/static/images/smarthealth.png" alt="Health System Logo" class="logo">
                 <h3>SmartHealth System</h3>
             </div>
             <nav class="sidebar-nav">
@@ -90,7 +90,7 @@
                 </div>
                 <div class="user-menu">                    
                     <div class="user-profile">
-                        <img src="{{ doctor_data.profile_image or url_for('static', filename='/images/landing.jpg') }}" alt="Doctor's profile">
+                        <img src="{{ doctor_data.profile_image or url_for('static', filename='/images/smarthealth.png') }}" alt="Doctor's profile">
                         <span>Dr. {{ doctor_data.first_name }} {{ doctor_data.last_name }}</span>
                         <a href="{{ url_for('signOut') }}"><span class="material-icons">logout</span></a>
                     </div>
