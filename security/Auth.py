@@ -1,3 +1,10 @@
+from functools import wraps
+import os
+from flask import jsonify, request, session
+import jwt
+
+SECRET_KEY = os.getenv('SECRET_KEY')
+
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
