@@ -17,6 +17,9 @@ The system is aimed at simplifying the process of client registration, program c
 
 ---
 
+## 📍📍 Application Logo
+![Logo](/static/images/smarthealth.png)s
+
 ---
 
 ## 🌐 Deployed Application
